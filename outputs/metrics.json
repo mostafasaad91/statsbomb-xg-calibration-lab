@@ -1,0 +1,304 @@
+{
+  "dataset": "StatsBomb Open Data (FIFA World Cup 2022 + UEFA Euro 2024 + Bundesliga 2023/24)",
+  "qa_summary": {
+    "total_shots": 3685.0,
+    "total_matches": 149.0,
+    "penalty_shots": 43.0,
+    "non_penalty_shots": 3642.0,
+    "non_penalty_goals": 352.0,
+    "np_conversion_pct": 9.67,
+    "freeze_frame_coverage_pct": 98.9
+  },
+  "splits": {
+    "train_shots": 2183,
+    "val_shots": 701,
+    "test_shots": 758,
+    "train_matches": 89,
+    "val_matches": 30,
+    "test_matches": 30
+  },
+  "models": {
+    "Naive Conversion Rate": {
+      "val_log_loss": 0.3153,
+      "test_log_loss": 0.3169,
+      "test_brier": 0.087,
+      "test_roc_auc": 0.5,
+      "test_roc_auc_ci95": [
+        0.5,
+        0.5
+      ],
+      "test_ece": 0.0008,
+      "sum_pred_xg": 73.61,
+      "actual_goals": 73
+    },
+    "Geometry-Only Logistic": {
+      "val_log_loss": 0.2867,
+      "test_log_loss": 0.2767,
+      "test_brier": 0.0784,
+      "test_roc_auc": 0.754,
+      "test_roc_auc_ci95": [
+        0.6923,
+        0.8122
+      ],
+      "test_ece": 0.0165,
+      "sum_pred_xg": 73.76,
+      "actual_goals": 73
+    },
+    "Full + Freeze-Frame Logistic": {
+      "val_log_loss": 0.2699,
+      "test_log_loss": 0.2531,
+      "test_brier": 0.0724,
+      "test_roc_auc": 0.8163,
+      "test_roc_auc_ci95": [
+        0.7625,
+        0.8598
+      ],
+      "test_ece": 0.0148,
+      "sum_pred_xg": 70.9,
+      "actual_goals": 73
+    },
+    "LightGBM xG (+Freeze-Frame)": {
+      "val_log_loss": 0.2769,
+      "test_log_loss": 0.2599,
+      "test_brier": 0.0747,
+      "test_roc_auc": 0.8028,
+      "test_roc_auc_ci95": [
+        0.7494,
+        0.8523
+      ],
+      "test_ece": 0.0131,
+      "sum_pred_xg": 69.6,
+      "actual_goals": 73
+    },
+    "XGBoost xG (+Freeze-Frame)": {
+      "val_log_loss": 0.2785,
+      "test_log_loss": 0.2588,
+      "test_brier": 0.0742,
+      "test_roc_auc": 0.8074,
+      "test_roc_auc_ci95": [
+        0.757,
+        0.8553
+      ],
+      "test_ece": 0.0204,
+      "sum_pred_xg": 70.97,
+      "actual_goals": 73
+    },
+    "StatsBomb Official xG (Ref)": {
+      "val_log_loss": 0.2616,
+      "test_log_loss": 0.2422,
+      "test_brier": 0.0679,
+      "test_roc_auc": 0.8271,
+      "test_roc_auc_ci95": [
+        0.7713,
+        0.8775
+      ],
+      "test_ece": 0.0211,
+      "sum_pred_xg": 71.5,
+      "actual_goals": 73
+    }
+  },
+  "selected_custom_model": "Full + Freeze-Frame Logistic",
+  "freeze_frame_logloss_gain": 0.0236,
+  "slice_audit": [
+    {
+      "slice": "competition=Bundesliga 2023/24",
+      "shots": 165,
+      "actual_goals": 21,
+      "sum_custom_xg": 17.66,
+      "brier": 0.096,
+      "roc_auc": 0.753
+    },
+    {
+      "slice": "competition=FIFA World Cup 2022",
+      "shots": 296,
+      "actual_goals": 30,
+      "sum_custom_xg": 27.63,
+      "brier": 0.072,
+      "roc_auc": 0.8625
+    },
+    {
+      "slice": "competition=UEFA Euro 2024",
+      "shots": 297,
+      "actual_goals": 22,
+      "sum_custom_xg": 25.62,
+      "brier": 0.0598,
+      "roc_auc": 0.8048
+    },
+    {
+      "slice": "is_header=0",
+      "shots": 628,
+      "actual_goals": 57,
+      "sum_custom_xg": 55.61,
+      "brier": 0.0678,
+      "roc_auc": 0.82
+    },
+    {
+      "slice": "is_header=1",
+      "shots": 130,
+      "actual_goals": 16,
+      "sum_custom_xg": 15.29,
+      "brier": 0.095,
+      "roc_auc": 0.8048
+    },
+    {
+      "slice": "is_inside_box=0",
+      "shots": 292,
+      "actual_goals": 7,
+      "sum_custom_xg": 8.62,
+      "brier": 0.0217,
+      "roc_auc": 0.7609
+    },
+    {
+      "slice": "is_inside_box=1",
+      "shots": 466,
+      "actual_goals": 66,
+      "sum_custom_xg": 62.28,
+      "brier": 0.1043,
+      "roc_auc": 0.7582
+    }
+  ],
+  "top_shap_features": [
+    {
+      "feature": "goal_angle_rad",
+      "mean_abs_shap": 0.4156
+    },
+    {
+      "feature": "is_inside_box",
+      "mean_abs_shap": 0.3435
+    },
+    {
+      "feature": "defenders_within_2_5yd",
+      "mean_abs_shap": 0.3162
+    },
+    {
+      "feature": "distance",
+      "mean_abs_shap": 0.2456
+    },
+    {
+      "feature": "body_part_Left Foot",
+      "mean_abs_shap": 0.214
+    },
+    {
+      "feature": "defenders_in_cone",
+      "mean_abs_shap": 0.1944
+    },
+    {
+      "feature": "distance_sq",
+      "mean_abs_shap": 0.1847
+    },
+    {
+      "feature": "body_part_Right Foot",
+      "mean_abs_shap": 0.1526
+    },
+    {
+      "feature": "gk_dist_to_shot",
+      "mean_abs_shap": 0.1507
+    },
+    {
+      "feature": "is_central_lane",
+      "mean_abs_shap": 0.1342
+    },
+    {
+      "feature": "technique_Normal",
+      "mean_abs_shap": 0.1056
+    },
+    {
+      "feature": "is_header",
+      "mean_abs_shap": 0.094
+    }
+  ],
+  "top5_overperformers": [
+    {
+      "player": "Cody Math\u00e8s Gakpo",
+      "team": "Netherlands",
+      "shots": 18,
+      "goals": 6,
+      "custom_xg": 1.5,
+      "statsbomb_xg": 1.45,
+      "goals_minus_xg": 4.5
+    },
+    {
+      "player": "Alejandro Grimaldo Garc\u00eda",
+      "team": "Bayer Leverkusen",
+      "shots": 71,
+      "goals": 10,
+      "custom_xg": 5.71,
+      "statsbomb_xg": 5.21,
+      "goals_minus_xg": 4.29
+    },
+    {
+      "player": "Florian Wirtz",
+      "team": "Bayer Leverkusen",
+      "shots": 70,
+      "goals": 10,
+      "custom_xg": 6.14,
+      "statsbomb_xg": 7.69,
+      "goals_minus_xg": 3.86
+    },
+    {
+      "player": "Bukayo Saka",
+      "team": "England",
+      "shots": 15,
+      "goals": 4,
+      "custom_xg": 1.25,
+      "statsbomb_xg": 1.1,
+      "goals_minus_xg": 2.75
+    },
+    {
+      "player": "Josip Stani\u0161i\u0107",
+      "team": "Bayer Leverkusen",
+      "shots": 10,
+      "goals": 3,
+      "custom_xg": 0.75,
+      "statsbomb_xg": 0.79,
+      "goals_minus_xg": 2.25
+    }
+  ],
+  "top5_underperformers": [
+    {
+      "player": "Romelu Lukaku Menama",
+      "team": "Belgium",
+      "shots": 16,
+      "goals": 0,
+      "custom_xg": 3.31,
+      "statsbomb_xg": 3.44,
+      "goals_minus_xg": -3.31
+    },
+    {
+      "player": "Cristiano Ronaldo dos Santos Aveiro",
+      "team": "Portugal",
+      "shots": 32,
+      "goals": 0,
+      "custom_xg": 3.28,
+      "statsbomb_xg": 3.34,
+      "goals_minus_xg": -3.28
+    },
+    {
+      "player": "Victor Okoh Boniface",
+      "team": "Bayer Leverkusen",
+      "shots": 77,
+      "goals": 10,
+      "custom_xg": 12.36,
+      "statsbomb_xg": 12.84,
+      "goals_minus_xg": -2.36
+    },
+    {
+      "player": "Antoine Griezmann",
+      "team": "France",
+      "shots": 18,
+      "goals": 0,
+      "custom_xg": 1.85,
+      "statsbomb_xg": 2.02,
+      "goals_minus_xg": -1.85
+    },
+    {
+      "player": "Lautaro Javier Mart\u00ednez",
+      "team": "Argentina",
+      "shots": 14,
+      "goals": 0,
+      "custom_xg": 1.8,
+      "statsbomb_xg": 2.12,
+      "goals_minus_xg": -1.8
+    }
+  ]
+}
