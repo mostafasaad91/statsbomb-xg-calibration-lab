@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StatsBomb 360 xG Calibration &amp; Shot Explorer — Live Football Lab | Mostafa Saad</title>
+  <meta name="description" content="Live interactive StatsBomb Open Data xG calibration & 3,642-shot pitch explorer across 149 matches (WC 2022, Euro 2024 & Invincible Bayer Leverkusen 23/24)." />
+  <meta property="og:title" content="StatsBomb 360 xG Calibration & Shot Explorer — Live Dashboard" />
+  <meta property="og:description" content="3,642 real StatsBomb shots · 149 matches · -0.0236 Freeze-Frame Log-Loss gain · 0.8163 AUC vs Official StatsBomb 0.8271 · 73-player Finishing Leaderboard." />
+  <meta property="og:image" content="https://raw.githubusercontent.com/mostafasaad91/statsbomb-xg-calibration-lab/main/assets/social-preview.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css?v=1" />
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="orb orb-emerald" aria-hidden="true"></div>
+  <div class="orb orb-cyan" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="brand-group">
+        <span class="live-badge mono"><span class="pulse"></span>STATSBOMB 360 · 3,642 REAL SHOTS · 149 MATCHES</span>
+        <h1>StatsBomb xG <span class="emerald">Calibration &amp; Shot Explorer</span></h1>
+      </div>
+
+      <nav class="tab-bar" role="tablist" aria-label="Dashboard Pages">
+        <button class="tab-btn active" data-tab="explorer" role="tab" aria-selected="true" data-i18n="t_exp">01 · 3,642-Shot Pitch Map</button>
+        <button class="tab-btn" data-tab="ablation" role="tab" aria-selected="false" data-i18n="t_abl">02 · 360 Ablation &amp; SHAP</button>
+        <button class="tab-btn" data-tab="leaderboard" role="tab" aria-selected="false" data-i18n="t_lb">03 · Finishing Leaderboard</button>
+      </nav>
+
+      <div class="top-actions">
+        <button class="pill-btn mono" id="themeToggle" type="button" title="Toggle AMOLED / Light">☀</button>
+        <button class="pill-btn mono" id="langToggle" type="button">عربي</button>
+        <a href="https://github.com/mostafasaad91/statsbomb-xg-calibration-lab" class="pill-btn mono external-only" target="_blank" rel="noopener">GitHub ↗</a>
+        <a href="https://mostafasaad91.github.io/?track=football" class="pill-btn em-btn mono external-only" target="_blank" rel="noopener">Football Lab ↗</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap main-body">
+    <!-- GLOBAL VERIFIED KPI STRIP -->
+    <section class="kpi-strip">
+      <div class="kpi-card glass">
+        <span class="kpi-lbl mono" data-i18n="k_shots">NON-PENALTY SHOTS</span>
+        <strong class="kpi-val emerald mono">3,642</strong>
+        <span class="kpi-sub">149 matches · 352 goals (9.67%)</span>
+      </div>
+      <div class="kpi-card glass">
+        <span class="kpi-lbl mono" data-i18n="k_ff">FREEZE-FRAME GAIN</span>
+        <strong class="kpi-val cyan mono">-0.0236 LL</strong>
+        <span class="kpi-sub">+0.0623 AUC · 98.9% 360 cov.</span>
+      </div>
+      <div class="kpi-card glass">
+        <span class="kpi-lbl mono" data-i18n="k_auc">HELD-OUT TEST AUC</span>
+        <strong class="kpi-val emerald mono">0.8163</strong>
+        <span class="kpi-sub">vs Official StatsBomb 0.8271</span>
+      </div>
+      <div class="kpi-card glass">
+        <span class="kpi-lbl mono" data-i18n="k_brier">TEST BRIER / ECE</span>
+        <strong class="kpi-val violet mono">0.0724</strong>
+        <span class="kpi-sub">ECE 0.0148 · Match-grouped CV</span>
+      </div>
+      <div class="kpi-card glass">
+        <span class="kpi-lbl mono" data-i18n="k_cal">HELD-OUT GOALS CAL.</span>
+        <strong class="kpi-val amber mono">70.9 vs 73</strong>
+        <span class="kpi-sub">StatsBomb Ref: 71.5 on 30 games</span>
+      </div>
+      <div class="kpi-card glass">
+        <span class="kpi-lbl mono" data-i18n="k_fin">TOP FINISHER (G−xG)</span>
+        <strong class="kpi-val emerald mono">+4.50</strong>
+        <span class="kpi-sub">Cody Gakpo · Grimaldo +4.29</span>
+      </div>
+    </section>
+
+    <!-- ================= PAGE 1: INTERACTIVE SHOT MAP EXPLORER ================= -->
+    <section class="tab-panel active" id="panel-explorer">
+      <div class="card glass filter-bar">
+        <div class="filters-grid">
+          <div class="f-item">
+            <label class="mono" for="fComp">Competition</label>
+            <select id="fComp" class="ctrl mono"><option value="">All 3 Competitions (149 Matches)</option></select>
+          </div>
+          <div class="f-item">
+            <label class="mono" for="fTeam">Team</label>
+            <select id="fTeam" class="ctrl mono"><option value="">All Teams</option></select>
+          </div>
+          <div class="f-item">
+            <label class="mono" for="fPlayer">Player Search</label>
+            <input type="text" id="fPlayer" class="ctrl mono" placeholder="e.g. Wirtz, Gakpo, Lukaku..." />
+          </div>
+          <div class="f-item">
+            <label class="mono" for="fBody">Body Part</label>
+            <select id="fBody" class="ctrl mono"><option value="">All Body Parts</option></select>
+          </div>
+          <div class="f-item">
+            <label class="mono" for="fOutcome">Outcome</label>
+            <select id="fOutcome" class="ctrl mono">
+              <option value="all">All Shots</option>
+              <option value="goal">Goals Only</option>
+              <option value="miss">Non-Goals Only</option>
+            </select>
+          </div>
+          <div class="f-item">
+            <label class="mono" for="fMinXg">Min xG: <strong class="emerald" id="fMinXgVal">0.00</strong></label>
+            <input type="range" id="fMinXg" min="0" max="0.6" step="0.02" value="0" />
+          </div>
+        </div>
+        <div class="star-row mono">
+          <span class="muted">QUICK STARS:</span>
+          <button class="star-btn active" data-star="" type="button">All 3,642</button>
+          <button class="star-btn" data-star="Florian Wirtz" type="button">Wirtz (+3.86)</button>
+          <button class="star-btn" data-star="Alejandro Grimaldo" type="button">Grimaldo (+4.29)</button>
+          <button class="star-btn" data-star="Cody" type="button">Gakpo (+4.50)</button>
+          <button class="star-btn" data-star="Mbappé" type="button">Mbappé</button>
+          <button class="star-btn" data-star="Messi" type="button">Messi</button>
+          <button class="star-btn" data-star="Harry Kane" type="button">Kane</button>
+          <button class="star-btn" data-star="Lukaku" type="button">Lukaku (-3.31)</button>
+          <button class="star-btn" data-star="Cristiano Ronaldo" type="button">Ronaldo (-3.28)</button>
+          <button class="star-btn reset-btn" id="resetFiltersBtn" type="button">↺ Reset</button>
+        </div>
+      </div>
+
+      <div class="explorer-grid mt-1">
+        <!-- Pitch Map -->
+        <div class="card glass">
+          <div class="card-head">
+            <div>
+              <span class="eyebrow mono emerald">INTERACTIVE HALF-PITCH · HOVER OR CLICK ANY SHOT FOR 360 TELEMETRY</span>
+              <h2 id="pitchTitle">All 3,642 Non-Penalty Shots (Size = xG · Emerald = Goal)</h2>
+            </div>
+            <div class="mini-leg mono">
+              <span><i class="dot em-bg"></i>Goal</span>
+              <span><i class="dot cy-bg"></i>No Goal</span>
+            </div>
+          </div>
+          <div class="pitch-wrap">
+            <svg id="shotPitch" viewBox="0 0 600 430" role="img" aria-label="Interactive StatsBomb Shot Map"></svg>
+          </div>
+          <div class="filtered-kpis mono" id="filteredKpis"></div>
+        </div>
+
+        <!-- Right: 360 Freeze-Frame Shot Inspector + Body/Zone Breakdown -->
+        <div class="right-col">
+          <div class="card glass accent-em">
+            <div class="card-head">
+              <div>
+                <span class="eyebrow mono cyan">360 FREEZE-FRAME TELEMETRY INSPECTOR</span>
+                <h2 id="inspTitle">Hover or Click a Shot on the Pitch</h2>
+              </div>
+              <span class="badge-pill mono" id="inspBadge">LIVE 360</span>
+            </div>
+            <div class="insp-grid mono" id="inspGrid"></div>
+          </div>
+
+          <div class="card glass">
+            <div class="card-head">
+              <div>
+                <span class="eyebrow mono violet">FILTERED SHOT CONTEXT</span>
+                <h2>Shots &amp; Goals by Defender Cone Pressure</h2>
+              </div>
+            </div>
+            <div class="chart-wrap h-230"><canvas id="chartDefPressure"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PAGE 2: 360 ABLATION, CALIBRATION & SHAP ================= -->
+    <section class="tab-panel" id="panel-ablation">
+      <div class="grid-2-eq">
+        <div class="card glass">
+          <div class="card-head">
+            <div>
+              <span class="eyebrow mono emerald">MATCH-GROUPED ABLATION · 30 UNSEEN TEST MATCHES (758 SHOTS)</span>
+              <h2>Log-Loss ↓ &amp; ROC-AUC ↑ Benchmark vs Official StatsBomb xG</h2>
+            </div>
+          </div>
+          <div class="chart-wrap h-310"><canvas id="chartAblation"></canvas></div>
+        </div>
+
+        <div class="card glass">
+          <div class="card-head">
+            <div>
+              <span class="eyebrow mono cyan">EXPLAINABLE SPATIAL ML · TOP 12 SHAP DRIVERS</span>
+              <h2>What Actually Moves Goal Probability? (Mean |SHAP|)</h2>
+            </div>
+          </div>
+          <div class="chart-wrap h-310"><canvas id="chartXgShap"></canvas></div>
+        </div>
+      </div>
+
+      <div class="grid-2-eq mt-1">
+        <div class="card glass">
+          <div class="card-head">
+            <div>
+              <span class="eyebrow mono violet">COMPLETE HELD-OUT BENCHMARK TABLE</span>
+              <h2>6-Model Comparison (Actual Goals = 73)</h2>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table mono" id="modelBenchTable">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Val LL</th>
+                  <th>Test LL ↓</th>
+                  <th>Brier ↓</th>
+                  <th>Test AUC (95% CI)</th>
+                  <th>Sum xG</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card glass">
+          <div class="card-head">
+            <div>
+              <span class="eyebrow mono amber">CALIBRATION SLICE AUDIT</span>
+              <h2>Performance by Competition, Headers &amp; Box Location</h2>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table mono" id="sliceTable">
+              <thead>
+                <tr>
+                  <th>Slice</th>
+                  <th>Shots</th>
+                  <th>Actual G</th>
+                  <th>Custom xG</th>
+                  <th>Brier ↓</th>
+                  <th>ROC-AUC ↑</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PAGE 3: CLINICAL FINISHING LEADERBOARD ================= -->
+    <section class="tab-panel" id="panel-leaderboard">
+      <div class="grid-2-eq">
+        <div class="card glass">
+          <div class="card-head">
+            <div>
+              <span class="eyebrow mono emerald">FINISHING VARIANCE · 73 QUALIFIED SHOOTERS</span>
+              <h2>Custom xG vs Actual Goals (Above Line = Clinical Overperformance)</h2>
+            </div>
+          </div>
+          <div class="chart-wrap h-340"><canvas id="chartFinScatter"></canvas></div>
+        </div>
+
+        <div class="card glass">
+          <div class="card-head">
+            <div>
+              <span class="eyebrow mono cyan">CLICK ANY PLAYER ROW TO INSPECT THEIR SHOT MAP ON PAGE 01</span>
+              <h2>Finishing Over/Under-Performance Leaderboard (G − xG)</h2>
+            </div>
+            <input type="text" id="lbSearch" class="ctrl mono" style="max-width:210px;" placeholder="Filter player or team..." />
+          </div>
+          <div class="table-wrap" style="max-height:345px;">
+            <table class="data-table mono" id="lbTable">
+              <thead>
+                <tr>
+                  <th data-sort="player">Player</th>
+                  <th data-sort="team">Team</th>
+                  <th data-sort="shots">Shots</th>
+                  <th data-sort="goals">Goals</th>
+                  <th data-sort="custom_xg">Custom xG</th>
+                  <th data-sort="statsbomb_xg">SB xG</th>
+                  <th data-sort="goals_minus_xg">G − xG</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot wrap mono">
+    <span>Built by Mostafa Saad · Official StatsBomb Open Data (WC 2022 · Euro 2024 · Bundesliga 23/24 · GroupShuffleSplit · pytest CI)</span>
+    <span><a href="https://mostafasaad91.github.io/?track=football" target="_blank" rel="noopener">mostafasaad91.github.io/?track=football</a></span>
+  </footer>
+
+  <script src="app.js?v=1"></script>
+</body>
+</html>
