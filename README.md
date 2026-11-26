@@ -1,5 +1,10 @@
 # StatsBomb Expected Goals (xG) Calibration & Freeze-Frame Lab
 
+[![Pipeline CI](https://github.com/mostafasaad91/statsbomb-xg-calibration-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/mostafasaad91/statsbomb-xg-calibration-lab/actions/workflows/ci.yml)
+![Python 3.11](https://img.shields.io/badge/Python-3.11-00E5FF?style=flat-square&logo=python&logoColor=white)
+![StatsBomb 360](https://img.shields.io/badge/StatsBomb-3%2C685%20Real%20Shots-10B981?style=flat-square)
+![AUC 0.816](https://img.shields.io/badge/Test%20AUC-0.8163-00E5FF?style=flat-square)
+
 > **End-to-End Football Analytics & ML Engineering** — Official **StatsBomb Open Data** (**3,685 real shots** across **149 matches**: FIFA World Cup 2022 + UEFA Euro 2024 + Bundesliga 2023/24 Invincible Bayer Leverkusen) · SQLite Spatial Mart · **Match-Grouped Zero-Leakage Validation** · **Freeze-Frame Defender & Goalkeeper Ablation** · Calibration Benchmark vs Official StatsBomb xG · SHAP Spatial Drivers · Finishing Over/Under-Performance Leaderboard.
 
 ![xG Calibration Benchmark vs Official StatsBomb xG](outputs/figures/02_xg_model_calibration.png)
