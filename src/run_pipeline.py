@@ -1,5 +1,5 @@
 """
-StatsBomb xG Calibration Lab — Custom Event + Freeze-Frame xG ML Benchmark
+StatsBomb 360 xG Calibration — Custom Event + Freeze-Frame xG ML Benchmark
 Author: Mostafa Saad
 Data: Official StatsBomb Open Data (FIFA World Cup 2022, UEFA Euro 2024, Bundesliga 2023/24)
 """
@@ -357,7 +357,7 @@ def main():
     plt.tight_layout()
     fig.savefig(FIG_DIR / "04_finishing_leaderboard.png", facecolor=BG)
     plt.close(fig)
-    print("[5/5] StatsBomb xG Calibration Lab complete!")
+    print("[5/5] StatsBomb 360 xG Calibration complete!")
 
 
 if __name__ == "__main__":
